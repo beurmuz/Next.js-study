@@ -10,7 +10,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div>
-        <h1>ONEBITE CINEMA</h1>
+        <h1>index page</h1>
       </div>
     </>
   );
