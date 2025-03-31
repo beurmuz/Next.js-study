@@ -1,11 +1,28 @@
 import style from "./index.module.css";
-import movies from "@/mock/movies.json";
 import SearchableLayout from "@/components/searchable-layout";
 import Head from "next/head";
 import { ReactNode } from "react";
 import MovieItem from "@/components/movie-item";
+import { InferGetServerSidePropsType } from "next";
+import fetchMovies from "@/lib/fetch-movies";
+import fetchRandomMoives from "@/lib/fetch-random-movies";
 
-export default function Home() {
+// SSR, 병렬로 데이터 가져오기
+export const getServerSideProps = async () => {
+  const [allMovies, recommendMovies] = await Promise.all([
+    fetchMovies(),
+    fetchRandomMoives(),
+  ]);
+
+  return {
+    props: { allMovies, recommendMovies },
+  };
+};
+
+export default function Home({
+  allMovies,
+  recommendMovies,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
     <>
       <Head>
@@ -17,7 +34,7 @@ export default function Home() {
         <section className={style.recommend_section}>
           <h3>지금 가장 추천하는 영화</h3>
           <li>
-            {movies.slice(0, 3).map((movie) => (
+            {recommendMovies.slice(0, 3).map((movie) => (
               <MovieItem key={movie.id} {...movie} />
             ))}
           </li>
@@ -25,7 +42,7 @@ export default function Home() {
         <section className={style.all_section}>
           <h3>등록된 모든 영화</h3>
           <li>
-            {movies.map((movie) => (
+            {allMovies.map((movie) => (
               <MovieItem key={movie.id} {...movie} />
             ))}
           </li>

@@ -1,30 +1,51 @@
-import { useRouter } from "next/router";
 import style from "./[id].module.css";
-import movies from "@/mock/movies.json";
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
+import fetchOneMovie from "@/lib/fetch-one-movie";
 
-export default function Page() {
-  const router = useRouter();
-  const id = router.query.id;
+// SSR
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const id = context.params!.id;
+  const movie = await fetchOneMovie(Number(id));
 
-  const nowMovie = movies.find((movie) => movie.id === Number(id));
-  if (!nowMovie) return <div>영화 정보를 불러올 수 없습니다. </div>;
+  return {
+    props: { movie },
+  };
+};
+
+export default function Page({
+  movie,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  if (!movie) return <div>영화 정보를 불러올 수 없습니다. </div>;
+
+  const {
+    id,
+    title,
+    subTitle,
+    description,
+    releaseDate,
+    company,
+    genres,
+    runtime,
+    posterImgUrl,
+  } = movie;
 
   return (
     <div className={style.container}>
       <div
         className={style.cover_img}
-        style={{ backgroundImage: `url('${nowMovie.posterImgUrl}')` }}
+        style={{ backgroundImage: `url('${posterImgUrl}')` }}
       >
-        <img src={nowMovie.posterImgUrl} />
+        <img src={posterImgUrl} />
       </div>
-      <div className={style.title}>{nowMovie.title}</div>
+      <div className={style.title}>{title}</div>
       <div>
-        {nowMovie.releaseDate} / {nowMovie.genres.join(", ")} /{" "}
-        {nowMovie.runtime}분
+        {releaseDate} / {genres.join(", ")} / {runtime}분
       </div>
-      <div>{nowMovie.company}</div>
-      <div className={style.subTitle}>{nowMovie.subTitle}</div>
-      <div className={style.description}>{nowMovie.description}</div>
+      <div>{company}</div>
+      <div className={style.subTitle}>{subTitle}</div>
+      <div className={style.description}>{description}</div>
     </div>
   );
 }
