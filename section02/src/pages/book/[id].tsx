@@ -1,6 +1,5 @@
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next";
 import style from "./[id].module.css";
-import { useRouter } from "next/router";
 import fetchOneBook from "@/lib/fetch-one-book";
 
 export const getServerSideProps = async (
@@ -20,7 +19,7 @@ export default function Page({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   if (!book) return "문제가 발생했습니다. 다시 시도하세요.";
 
-  const { id, title, subTitle, description, author, publisher, coverImgUrl } =
+  const { title, subTitle, description, author, publisher, coverImgUrl } =
     book;
   return (
     <div className={style.container}>
